@@ -1,0 +1,467 @@
+# BFS
+#Breadth First Search
+from collections import deque
+
+def bfsSearch(graph,start):
+    visited=[]
+    queue=deque([start])
+    while queue:
+        node=queue.popleft()
+        if node not in visited:
+            visited.append(node)
+            queue.extend(graph[node])
+    print("BFS Traversal:",visited)
+
+    graph = {
+    "A":["B","C","D"],
+    "B":["E","F"],
+    "C":[],
+    "D":["G"],
+    "E":[],
+    "F":[],
+    "G":[]}
+bfsSearch(graph,'A')
+
+#Breadth First Search
+from collections import deque
+
+def bfsSearch(graph,start):
+    visited=[]
+    queue=deque([start])
+    while queue:
+        node=queue.popleft()
+        if node not in visited:
+            visited.append(node)
+            queue.extend(graph[node])
+        print("Visited:",visited)
+#### Print visited list in every iteration
+graph = {
+    "A":["B","C","D"],
+    "B":["E","F"],
+    "C":[],
+    "D":["G"],
+    "E":[],
+    "F":[],
+    "G":[]}
+bfsSearch(graph,'A')
+### Have a goal node,print when goal node is found
+#Breadth First Search
+from collections import deque
+
+def bfsSearch(graph,start,goal):
+    visited=[]
+    queue=deque([start])
+    while queue:
+        node=queue.popleft()
+        if node not in visited:
+            visited.append(node)
+            queue.extend(graph[node])
+            if node==goal:
+                print("Goal Node Found:",node)
+                break
+    print("Visited:",visited)
+
+graph = {
+    "A":["B","C","D"],
+    "B":["E","F"],
+    "C":[],
+    "D":["G"],
+    "E":[],
+    "F":[],
+    "G":[]}
+
+start_node = "A"
+goal_node = "G"
+bfsSearch(graph,start_node,goal_node)
+
+## DFS
+
+#Depth First Search
+def dfsSearch(graph,start,goal):
+    visited=[]
+    stack=[start]
+    while stack:
+        node=stack.pop()
+        if node not in visited:
+            visited.append(node)
+            stack.extend(reversed(graph[node]))
+            if node==goal:
+              print("Goal Node Found:",node)
+              break
+    print("DFS Traversal:",visited)
+
+
+graph = {
+    "A":["B","C","D"],
+    "B":["E","F"],
+    "C":[],
+    "D":["G"],
+    "E":[],
+    "F":[],
+    "G":[]}
+
+start_node = "A"
+goal_node = "G"
+dfsSearch(graph,start_node,goal_node)
+
+
+##### recursive version of DFS
+def dfs_recursive(graph, node, goal, visited=None):
+    if visited is None:
+        visited = []
+
+    visited.append(node)
+
+    if node == goal:
+        print("Goal Node Found:", node)
+        print("DFS Traversal:", visited)
+        return True
+
+    for neighbor in graph[node]:
+        if neighbor not in visited:
+            if dfs_recursive(graph, neighbor, goal, visited):
+                return True
+
+    return False
+
+graph = {
+    "A": ["B", "C", "D"],
+    "B": ["E", "F"],
+    "C": [],
+    "D": ["G"],
+    "E": [],
+    "F": [],
+    "G": []
+}
+
+start_node = "A"
+goal_node = "E"
+dfs_recursive(graph, start_node, goal_node)
+
+ ## Depth Limited Search
+ #Depth Limited Search
+def dls(graph,start,goal,limit):
+    def rec_dls(node,goal,limit,path,visited):
+        if node==goal:
+            return path
+        if limit<=0:
+            return None
+        visited.add(node)
+        for neighbor in graph.get(node,[]):
+            if neighbor not in visited:
+                result=rec_dls(neighbor,goal,limit-1,path+[neighbor],visited)
+                if result is not None:
+                    return result
+        return None
+    return rec_dls(start,goal,limit,[start],set())
+
+    graph = {
+    "A":["B","C","D"],
+    "B":["E","F"],
+    "C":[],
+    "D":["G"],
+    "E":[],
+    "F":[],
+    "G":[]}
+start='A'
+goal='G'
+limit=3
+r=dls(graph,start,goal,limit)
+if r:
+    print(f"Path Found:{r}")
+else:
+    print("No path found within the depth limit.")
+
+
+
+
+    Ex-3  IDDLS 8 puzzle problem
+
+    import copy
+# goal_state=[[1,2,3],[4,5,6],[7,8,0]] # Goal state is a list of lists
+moves=[(-1,0),(1,0),(0,-1),(0,1)] # Moves is a list of tuples
+
+# (-1,0) - move up
+# (1,0) - move down
+# (0,-1) - move left
+# (0,1) - move right
+# State is a 2D list(list of list)
+# It represents the 8 puzzle board -- a 3X3 grid
+state=[[1,2,3],[4,0,6],[7,5,8]]
+def find_zero(state):
+    for i in range(3):
+        for j in range(3):
+            if state[i][j]==0:
+                return i,j
+
+def is_goal(state,goal_state):
+    return state==goal_state
+# def is_goal(state):
+#     return state==goal_state
+
+def get_children(state):
+    children=[]
+    x,y=find_zero(state)
+    for dx,dy in moves:
+        nx,ny=x+dx,y+dy
+        if 0<=nx<3 and 0<=ny<3:
+            new_state=copy.deepcopy(state)
+            new_state[x][y],new_state[nx][ny]=new_state[nx][ny],new_state[x][y]
+            children.append(new_state)
+    return children
+
+    def DLS(state,depth,visited,goal_state):
+    if is_goal(state,goal_state):
+        return state
+    if depth==0:
+        return None
+    visited.add(str(state))
+    for child in get_children(state):
+        if str(child) not in visited:
+            result=DLS(child,depth-1,visited,goal_state)
+            if result:
+                return result
+    return None
+
+    def IDDFS(start_state,max_depth,goal_state):
+    for depth in range(max_depth+1):
+        visited=set()
+        result=DLS(start_state,depth,visited,goal_state)
+        if result:
+            print(f"Solution found at depth: {depth}")
+            return result
+    return None
+
+    # Case-1
+start_state=[[1,2,3],[4,0,6],[7,5,8]]
+custom_goal=[[1,2,3],[4,5,6],[7,8,0]] # custom goal state given by the user
+max_depth=20
+
+solution=IDDFS(start_state,max_depth,custom_goal)
+
+if solution:
+    print("Goal state reached: ")
+    for row in solution:
+        print(row)
+else:
+    print("No solution found within the depth limit.")
+
+# Case-2
+start_state=[[1,2,3],[4,0,6],[7,5,8]]
+custom_goal=[[1,0,3],[4,5,6],[7,8,2]] # custom goal state given by the user
+max_depth=20
+
+solution=IDDFS(start_state,max_depth,custom_goal)
+
+if solution:
+    print("Goal state reached: ")
+    for row in solution:
+        print(row)
+else:
+    print("No solution found within the depth limit.")
+
+
+    from collections import deque
+graph={
+    'A':['B','C'],
+    'B':['A','D'],
+    'C':['A','E'],
+    'D':['B','F'],
+    'E':['C','F'],
+    'F':['D','E','G'],
+    'G':['F']
+}
+
+def bidirectional_search(start,goal):
+    if start==goal:
+        return [start]
+    # Queues for BFS from start and goal
+    front_queue=deque([start])
+    back_queue=deque([goal])
+    # Visited sets
+    front_visited={start:None}
+    back_visited={goal:None}
+
+    while front_queue and back_queue:
+        result=expand_layer(front_queue,front_visited,back_visited)
+        if result:
+            return build_path(result,front_visited,back_visited)
+        result=expand_layer(back_queue,back_visited,front_visited)
+    return None # When no path found
+
+def bidirectional_search(start, goal):
+    if start == goal:
+        return [start]
+    front_queue = deque([start])
+    back_queue = deque([goal])
+    front_visited = {start: None}
+    back_visited = {goal: None}
+
+    print("Initial front_visited:", front_visited)
+    print("Initial back_visited:", back_visited)
+    print("..........")
+
+    while front_queue and back_queue:
+        result = expand_layer(front_queue, front_visited, back_visited)
+        print("After front expansion:")
+        print("front_visited:", front_visited)
+        print("back_visited:", back_visited)
+        print("..............")
+        if result:
+            return build_path(result, front_visited, back_visited)
+
+        result = expand_layer(back_queue, back_visited, front_visited)
+        print("After back expansion:")
+        print("front_visited:", front_visited)
+        print("back_visited:", back_visited)
+        print("---")
+        if result:
+            return build_path(result, front_visited, back_visited)
+    return None
+
+
+    def expand_layer(queue,visited,other_visited):
+    current=queue.popleft()
+    for neighbor in graph[current]:
+        if neighbor not in visited:
+            visited[neighbor]=current
+            queue.append(neighbor)
+            if neighbor in other_visited:
+                return neighbor # Meeting point
+    return None
+
+    def build_path(meeting_point,front_visited,back_visited):
+    path=[]
+    node=meeting_point
+    while node:
+        path.append(node)
+        node=front_visited[node]
+    path=path[::-1]
+
+    node=back_visited[meeting_point]
+    while node:
+        path.append(node)
+        node=back_visited[node]
+    return path
+
+    # Example 1
+start='A'
+goal='G'
+path=bidirectional_search(start,goal)
+print("Path: ",path)
+
+# Uniform Cost Search
+import heapq
+
+def uniform_cost_search(graph,start,goal):
+    queue=[(0,start,[start])]
+    visited=set()
+
+    while queue:
+        cost,current,path=heapq.heappop(queue)
+        if current==goal:
+            return path,cost
+        if current in visited:
+            continue
+        visited.add(current)
+
+        for neighbor,edge_cost in graph.get(current,[]):
+            if neighbor not in visited:
+                heapq.heappush(queue,(cost+edge_cost,neighbor,path+[neighbor]))
+    return None, float('inf') # No path found
+
+    # Sample Graph with weighted edges
+# Format: node: [(neighbor1, cost1), (neighbor2, cost),...]
+graph={
+    'A':[('B',1),('C',4)],
+    'B':[('D',2),('E',5)],
+    'C':[('F',3)],
+    'D':[('G',1)],
+    'E':[],
+    'F':[('G',2)],
+    'G':[]
+}
+
+
+start_node='A'
+goal_node='G'
+path,total_cost=uniform_cost_search(graph,start_node,goal_node)
+
+# Output the result
+if path:
+    print("Least-cost path from",start_node,"to",goal_node,":", path)
+    print("Total cost: ",total_cost)
+else:
+    print("No path found from",start_node,"to",goal_node)
+
+
+####### N queens
+
+import random
+N=8 # 8-Queens
+POP_SIZE=50
+MUTATION_RATE=0.1
+GENERATIONS=1000
+# Chromosome: list of length N, each value=row position for queen in the column
+def random_chromosome():
+    return [random.randint(0,N-1) for _ in range(N)]
+
+# Fitness function: count non-attacking pairs
+def fitness(chromosome):
+    non_attacking = 0  
+    total_pairs = (N * (N - 1)) // 2 # For N=8, this is 28  
+
+    for i in range(N):
+        for j in range(i + 1, N):
+            # Queens attack if on same row or diagonal.
+            if chromosome[i] != chromosome[j] and abs(chromosome[i] - chromosome[j]) != abs(i - j):
+                non_attacking += 1  
+
+    return non_attacking # Max = 28 for N=8
+
+# Selection: tournament
+def selection(population):
+    tournament_size = 5
+    tournament = random.sample(population, tournament_size)
+    tournament.sort(key=lambda ch: fitness(ch), reverse=True)
+    return tournament[0]
+
+# Crossover: single point
+def crossover(parent1, parent2):
+    point = random.randint(1, N - 2)
+    return parent1[:point] + parent2[point:]
+
+# Mutation: change row of a queen randomly
+def mutate(chromosome):
+    for i in range(N):
+        if random.random() < MUTATION_RATE:
+            chromosome[i] = random.randint(0, N - 1)
+    return chromosome
+
+# Main GA Loop
+population = [random_chromosome() for _ in range(POP_SIZE)]
+
+for generation in range(GENERATIONS):
+    population.sort(key=lambda ch: fitness(ch), reverse=True)
+
+    # Print best solution of this generation
+    best = population[0]
+    best_fit = fitness(best)
+    print(f"Gen {generation}: Best = {best}, Fitness = {best_fit}")
+
+    # Stop if solution found
+    if best_fit == (N * (N - 1)) // 2:
+        print("Solution found!")
+        break
+
+    # Create new population
+    new_population = population[:2] # Elitism: carry best 2
+    while len(new_population) < POP_SIZE:
+        parent1 = selection(population)
+        parent2 = selection(population)
+        child = crossover(parent1, parent2)
+        child = mutate(child)
+        new_population.append(child)
+
+    population = new_population
+
