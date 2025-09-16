@@ -1,0 +1,26 @@
+#Simple execution without Hadoop
+cat input.txt | python mapper.py | sort | python reducer.py
+
+#With Hadoop
+
+sudo -u hdfs hadoop fs -mkdir /file
+hadoop fs -ls /
+
+sudo -u hdfs hadoop fs -put /home/cloudera/input.txt /file/input.txt
+hadoop fs -ls /file
+
+chmod 777 mapper.py reducer.py
+
+sudo -u hdfs hadoop fs -chown cloudera /file
+
+hadoop jar /usr/lib/hadoop-0.20-mapreduce/contrib/streaming/hadoop-streaming-2.6.0-mr1-cdh5.4.2.jar -input /file/input.txt -output /file/out -mapper /home/cloudera/mapper.py -reducer /home/cloudera/reducer.py 
+
+hdfs dfs -cat /file/out/part-00000
+
+
+
+
+
+ftp://192.168.72.141
+
+/125/126156101
