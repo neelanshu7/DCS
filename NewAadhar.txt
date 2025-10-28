@@ -2,6 +2,67 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
 from pyspark.sql.types import BooleanType
 import re
+
+# Step 1: Start Spark session
+spark = SparkSession.builder.appName("BasicBloomFilterTweets").getOrCreate()
+
+# Step 2: Simple Bloom Filter class using built-in hash()
+class SimpleBloomFilter:
+    def __init__(self, size=1000, hash_count=3):
+        self.size = size
+        self.hash_count = hash_count
+        self.bit_array = [0] * size
+
+    def _hashes(self, word):
+        return [(hash(word + str(i)) % self.size) for i in range(self.hash_count)]
+
+    def add(self, word):
+        for pos in self._hashes(word):
+            self.bit_array[pos] = 1
+
+    def check(self, word):
+        return all(self.bit_array[pos] == 1 for pos in self._hashes(word))
+
+# Step 3: Create whitelist and Bloom filter
+whitelist_hashtags = ["#AI", "#DataScience"]
+whitelist_users = ["@OpenAI", "@Spark"]
+
+bloom = SimpleBloomFilter()
+for item in whitelist_hashtags + whitelist_users:
+    bloom.add(item.lower())
+
+# Step 4: Sample tweets dataset
+data = [
+    ("Learning #AI and #ML with @OpenAI",),
+    ("Exploring nature today",),
+    ("Big data with @Spark and #DataScience",),
+    ("Random thoughts",)
+]
+tweets_df = spark.createDataFrame(data, ["tweet"])
+
+# Step 5: Define UDF to check tweets
+def tweet_filter(text):
+    hashtags = re.findall(r"#\w+", text)
+    mentions = re.findall(r"@\w+", text)
+    for term in hashtags + mentions:
+        if bloom.check(term.lower()):
+            return True
+    return False
+
+bloom_udf = udf(tweet_filter, BooleanType())
+
+# Step 6: Filter tweets
+filtered_df = tweets_df.filter(bloom_udf("tweet"))
+
+# Step 7: Show final output
+filtered_df.show(truncate=False)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import udf
+from pyspark.sql.types import BooleanType
+import re
 import hashlib
 
 # Step 1: Initialize Spark session
